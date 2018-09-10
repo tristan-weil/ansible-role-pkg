@@ -1,0 +1,12 @@
+---
+
+- name: install/remove packages
+  apt:
+    name: "{{ item.name | default(item) }}"
+    state: "{% if pkg_force_upgrade and item.state | default('present') == 'present' %}latest{% else %}{{ item.state | default('present') }}{% endif %}"
+    default_release: "{{ item.default_release | default(omit) }}"
+    update_cache: True
+    cache_valid_time: 3600
+    purge: True
+    autoclean: True
+  with_items: "{{ pkg_list }}"
