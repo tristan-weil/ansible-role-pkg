@@ -1,12 +1,47 @@
 ---
 
-- name: install/remove packages
+# Set in /etc/apt.conf.d/01t18S-custom:
+# Apt::Install-Recommends "false";
+# Apt::Install-Suggests "false";
+# APT::Clean-Installed "false";
+# APT::Get::Upgrade-Allow-New "true";
+
+- name: update cache
   apt:
-    name: "{{ item.name | default(item) }}"
-    state: "{% if pkg_force_upgrade and item.state | default('present') == 'present' %}latest{% else %}{{ item.state | default('present') }}{% endif %}"
-    default_release: "{{ item.default_release | default(omit) }}"
-    update_cache: True
     cache_valid_time: 3600
-    purge: True
+    update_cache: True
     autoclean: True
+
+- name: apt-get install
+  command: |
+    apt-get -y install \
+      {% if item.default_release is defined %}-t {{ item.default_release }}{% endif %} \
+      {% if pkg_Debian_apt_allow_downgrades %}--allow-downgrades{% endif %} \
+      {% if item.version is defined %}--allow-change-held-packages{% endif %} \
+      {% if item.version is not defined %}--no-upgrade{% endif %} \
+      {{ item.name | default(item) }}{% if item.version is defined %}={{ item.version }}{% endif %}
+  args:
+    warn: False
+  when: item.state | default('present') == 'present'
+  register: __pkg_Debian_item_install_result
+  changed_when: not __pkg_Debian_item_install_result.stdout is search('is already the newest version')
+  failed_when: __pkg_Debian_item_install_result.rc != 0
+  with_items: "{{ pkg_list }}"
+
+- name: apt-get remove
+  command: |
+    apt-get -y remove --purge \
+      {{ item.name | default(item) }}
+  args:
+    warn: False
+  when: item.state | default('present') == 'absent'
+  changed_when: not __pkg_Debian_item_remove_result.stdout is search('is not installed, so not removed')
+  failed_when: __pkg_Debian_item_remove_result.rc != 0
+  with_items: "{{ pkg_list }}"
+
+- name: hold packages
+  dpkg_selections:
+    name: "{{ item.name }}"
+    selection: hold
+  when: item.version is defined
   with_items: "{{ pkg_list }}"

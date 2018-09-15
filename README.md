@@ -2,7 +2,7 @@
 
 An Ansible Role that installs a list of packages on Debian or OpenBSD.
 
-By default, packages already installed won't be updated.
+**NOTE**: packages already installed won't be upgraded if the version is not provided.
 
 ## Role Variables
 
@@ -12,9 +12,9 @@ Available variables are listed below, along with default values (see `defaults/m
     
 The list of packages to install.
     
-    pkg_force_upgrade: False                        # True|False
+    pkg_Debian_apt_allow_downgrades: False          # True|False
     
-If an upgrade is needed using this role, the variable must be set to `True`.
+For Debian, by default, downgrades are disallowed but it can be allowed with this variable set to `True`.
 
 ## Dependencies
 

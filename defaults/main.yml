@@ -2,4 +2,4 @@
 
 pkg_list: []
 
-pkg_force_upgrade: False
+pkg_Debian_apt_allow_downgrades: False
