@@ -31,19 +31,18 @@
   with_items: "{{ pkg_list }}"
 
 - name: apt-get remove
-  command: |
-    apt-get -y remove --purge \
-      {{ item.name | default(item) }}
-  args:
-    warn: False
+  apt:
+    name: "{{ item.name | default(item) }}"
+    state: absent
+    purge: True
   when: item.state | default('present') == 'absent'
-  changed_when: not __pkg_Debian_item_remove_result.stdout is search('is not installed, so not removed')
-  failed_when: __pkg_Debian_item_remove_result.rc != 0
   with_items: "{{ pkg_list }}"
 
 - name: hold packages
   dpkg_selections:
     name: "{{ item.name }}"
     selection: hold
-  when: item.version is defined
+  when: >
+    item.version is defined
+    and item.state | default('present') == 'absent'
   with_items: "{{ pkg_list }}"
