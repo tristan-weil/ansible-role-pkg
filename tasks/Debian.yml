@@ -1,6 +1,6 @@
 ---
 
-# Set in /etc/apt.conf.d/01t18S-custom:
+# Set in /etc/apt.conf.d/01t18s-custom:
 # Apt::Install-Recommends "false";
 # Apt::Install-Suggests "false";
 # APT::Clean-Installed "false";
@@ -11,6 +11,7 @@
     cache_valid_time: 3600
     update_cache: True
     autoclean: True
+  when: pkg_list | length > 0
 
 - name: apt-get install
   command: |
