@@ -33,11 +33,9 @@
 
 - name: apt-get remove
   apt:
-    name: "{{ item.name | default(item) }}"
+    name: "{{ pkg_list | selectattr('state', 'eq', 'absent') | map(attribute='name') }}"
     state: absent
     purge: True
-  when: item.state | default('present') == 'absent'
-  with_items: "{{ pkg_list }}"
 
 - name: hold packages
   dpkg_selections:
