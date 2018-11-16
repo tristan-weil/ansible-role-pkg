@@ -17,7 +17,7 @@
   command: |
     apt-get -y install \
       {% if item.default_release is defined %}-t {{ item.default_release }}{% endif %} \
-      {% if pkg_Debian_apt_allow_downgrades %}--allow-downgrades{% endif %} \
+      {% if pkg_Debian_apt_allow_downgrades | bool %}--allow-downgrades{% endif %} \
       {% if item.version is defined %}--allow-change-held-packages{% endif %} \
       {% if item.version is not defined %}--no-upgrade{% endif %} \
       {{ item.name | default(item) }}{% if item.version is defined %}={{ item.version }}{% endif %}
