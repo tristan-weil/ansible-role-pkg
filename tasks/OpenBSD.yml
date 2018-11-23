@@ -5,4 +5,4 @@
     name: "{{ item.name | default(item) }}"
     state: "{{ item.state | default('present') }}"
     purge: yes
-  with_items: "{{ pkg_list }}"
+  loop: "{{ pkg_list }}"

@@ -29,7 +29,7 @@
     not __pkg_Debian_item_install_result.stdout is search('is already the newest version')
     and not __pkg_Debian_item_install_result.stdout is search('it is already installed and upgrade is not set')
   failed_when: __pkg_Debian_item_install_result.rc != 0
-  with_items: "{{ pkg_list }}"
+  loop: "{{ pkg_list }}"
 
 - name: apt-get remove
   apt:
@@ -44,4 +44,4 @@
   when: >
     item.version is defined
     and item.state | default('present') == 'absent'
-  with_items: "{{ pkg_list }}"
+  loop: "{{ pkg_list }}"
