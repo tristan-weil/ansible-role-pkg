@@ -11,6 +11,7 @@
     cache_valid_time: 3600
     update_cache: True
     autoclean: True
+  changed_when: False
   when: pkg_list | length > 0
 
 - block:
