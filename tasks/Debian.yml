@@ -54,13 +54,16 @@
 
 - name: apt-get remove
   apt:
-    name: "{{ pkg_list | selectattr('state', 'eq', 'absent') | map(attribute='name') }}"
+    name: "{{ item.name }}"
     state: absent
     purge: True
+    autoremove: True
+  when: item.state | default('present') == 'absent'
   register: __pkg_retry_result
   until: __pkg_retry_result.msg is not defined or __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
   retries: 20
   delay: 1
+  loop: "{{ pkg_list }}"
 
 - name: hold packages
   dpkg_selections:
