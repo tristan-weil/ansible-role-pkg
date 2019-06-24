@@ -14,9 +14,14 @@
   changed_when: False
   when: pkg_list | length > 0
   register: __pkg_retry_result
-  until: __pkg_retry_result.msg is not defined or __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+  until: >
+    __pkg_retry_result.msg is not defined
+    or (
+      __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+      and __pkg_retry_result.msg is not search("Could not get lock")
+    )
   retries: 20
-  delay: 1
+  delay: 5
 
 - block:
     - name: apt-get install
@@ -37,7 +42,7 @@
       failed_when: __pkg_retry_result.rc != 0
       until: __pkg_retry_result.rc == 0
       retries: 20
-      delay: 1
+      delay: 5
       loop: "{{ pkg_list }}"
   when: pkg_list[0] is mapping
 
@@ -47,9 +52,14 @@
         name: "{{ pkg_list }}"
         state: present
       register: __pkg_retry_result
-      until: __pkg_retry_result.msg is not defined or __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+      until: >
+        __pkg_retry_result.msg is not defined
+        or (
+          __pkg_retry_result.stderr is not search("Failed to lock apt for exclusive operation")
+          and __pkg_retry_result.stderr is not search("Could not get lock")
+        )
       retries: 20
-      delay: 1
+      delay: 5
   when: not pkg_list[0] is mapping
 
 - name: apt-get remove
@@ -60,9 +70,14 @@
     autoremove: True
   when: item.state | default('present') == 'absent'
   register: __pkg_retry_result
-  until: __pkg_retry_result.msg is not defined or __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+  until: >
+    __pkg_retry_result.msg is not defined
+    or (
+      __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+      and __pkg_retry_result.msg is not search("Could not get lock")
+    )
   retries: 20
-  delay: 1
+  delay: 5
   loop: "{{ pkg_list }}"
 
 - name: hold packages
@@ -73,7 +88,12 @@
     item.version is defined
     and item.state | default('present') == 'absent'
   register: __pkg_retry_result
-  until: __pkg_retry_result.msg is not defined or __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+  until: >
+    __pkg_retry_result.msg is not defined
+    or (
+      __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+      and __pkg_retry_result.msg is not search("Could not get lock")
+    )
   retries: 20
-  delay: 1
+  delay: 5
   loop: "{{ pkg_list }}"
