@@ -20,47 +20,46 @@
       __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
       and __pkg_retry_result.msg is not search("Could not get lock")
     )
-  retries: 20
-  delay: 5
+  retries: 60
+  delay: 1
 
-- block:
-    - name: apt-get install
-      command: |
-        apt-get -y install \
-          {% if item.default_release is defined %}-t {{ item.default_release }}{% endif %} \
-          {% if pkg_Debian_apt_allow_downgrades | bool %}--allow-downgrades{% endif %} \
-          {% if item.version is defined %}--allow-change-held-packages{% endif %} \
-          {% if item.version is not defined %}--no-upgrade{% endif %} \
-          {{ item.name | default(item) }}{% if item.version is defined %}={{ item.version }}{% endif %}
-      args:
-        warn: False
-      when: item.state | default('present') == 'present'
-      register: __pkg_retry_result
-      changed_when: >
-        not __pkg_retry_result.stdout is search('is already the newest version')
-        and not __pkg_retry_result.stdout is search('it is already installed and upgrade is not set')
-      failed_when: __pkg_retry_result.rc != 0
-      until: __pkg_retry_result.rc == 0
-      retries: 20
-      delay: 5
-      loop: "{{ pkg_list }}"
-  when: pkg_list[0] is mapping
+- name: apt-get install
+  command: |
+    apt-get -y install \
+      {% if item.default_release is defined %}-t {{ item.default_release }}{% endif %} \
+      {% if pkg_Debian_apt_allow_downgrades | bool %}--allow-downgrades{% endif %} \
+      {% if item.version is defined %}--allow-change-held-packages{% endif %} \
+      {% if item.version is not defined %}--no-upgrade{% endif %} \
+      {{ item.name | default(item) }}{% if item.version is defined %}={{ item.version }}{% endif %}
+  args:
+    warn: False
+  when: >
+    pkg_list[0] is mapping
+    and item.state | default('present') == 'present'
+  register: __pkg_retry_result
+  changed_when: >
+    not __pkg_retry_result.stdout is search('is already the newest version')
+    and not __pkg_retry_result.stdout is search('it is already installed and upgrade is not set')
+  failed_when: __pkg_retry_result.rc != 0
+  until: __pkg_retry_result.rc == 0
+  retries: 60
+  delay: 1
+  loop: "{{ pkg_list }}"
 
-- block:
-    - name: apt-get install
-      apt:
-        name: "{{ pkg_list }}"
-        state: present
-      register: __pkg_retry_result
-      until: >
-        __pkg_retry_result.msg is not defined
-        or (
-          __pkg_retry_result.stderr is not search("Failed to lock apt for exclusive operation")
-          and __pkg_retry_result.stderr is not search("Could not get lock")
-        )
-      retries: 20
-      delay: 5
+- name: apt-get install
+  apt:
+    name: "{{ pkg_list }}"
+    state: present
+  register: __pkg_retry_result
   when: not pkg_list[0] is mapping
+  until: >
+    __pkg_retry_result.msg is not defined
+    or (
+      __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
+      and __pkg_retry_result.msg is not search("Could not get lock")
+    )
+  retries: 60
+  delay: 1
 
 - name: apt-get remove
   apt:
@@ -76,8 +75,8 @@
       __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
       and __pkg_retry_result.msg is not search("Could not get lock")
     )
-  retries: 20
-  delay: 5
+  retries: 60
+  delay: 1
   loop: "{{ pkg_list }}"
 
 - name: hold packages
@@ -94,6 +93,6 @@
       __pkg_retry_result.msg is not search("Failed to lock apt for exclusive operation")
       and __pkg_retry_result.msg is not search("Could not get lock")
     )
-  retries: 20
-  delay: 5
+  retries: 60
+  delay: 1
   loop: "{{ pkg_list }}"

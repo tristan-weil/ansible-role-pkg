@@ -1,5 +1,9 @@
 ---
 
+# TODO:
+# - check locks
+# - add retries
+
 - name: install/remove packages
   openbsd_pkg:
     name: "{{ item.name | default(item) }}"
