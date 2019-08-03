@@ -8,5 +8,5 @@
   openbsd_pkg:
     name: "{{ item.name | default(item) }}"
     state: "{{ item.state | default('present') }}"
-    purge: yes
+    purge: True
   loop: "{{ pkg_list }}"
