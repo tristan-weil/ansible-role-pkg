@@ -6,11 +6,13 @@
 # APT::Clean-Installed "false";
 # APT::Get::Upgrade-Allow-New "true";
 
-- name: update cache
+- name: 'update cache'
   apt:
     cache_valid_time: 3600
     update_cache: True
     autoclean: True
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   changed_when: False
   when: pkg_list | length > 0
   register: __pkg_retry_result
@@ -23,14 +25,16 @@
   retries: 60
   delay: 1
 
-- name: apt-get install
+- name: 'apt-get install'
   command: |
     apt-get -y install \
       {% if item.default_release is defined %}-t {{ item.default_release }}{% endif %} \
-      {% if pkg_Debian_apt_allow_downgrades | bool %}--allow-downgrades{% endif %} \
+      {% if item.allow_downgrades | default(False) | bool %}--allow-downgrades{% endif %} \
       {% if item.version is defined %}--allow-change-held-packages{% endif %} \
-      {% if item.version is not defined %}--no-upgrade{% endif %} \
+      {% if item.version is not defined and not item.allow_upgrade | default(False) | bool %}--no-upgrade{% endif %} \
       {{ item.name | default(item) }}{% if item.version is defined %}={{ item.version }}{% endif %}
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   args:
     warn: False
   when: >
@@ -46,10 +50,12 @@
   delay: 1
   loop: "{{ pkg_list }}"
 
-- name: apt-get install
+- name: 'apt-get install'
   apt:
     name: "{{ pkg_list }}"
-    state: present
+    state: 'present'
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   register: __pkg_retry_result
   when: not pkg_list[0] is mapping
   until: >
@@ -61,12 +67,14 @@
   retries: 60
   delay: 1
 
-- name: apt-get remove
+- name: 'apt-get remove'
   apt:
     name: "{{ item.name }}"
-    state: absent
+    state: 'absent'
     purge: True
     autoremove: True
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   when: item.state | default('present') == 'absent'
   register: __pkg_retry_result
   until: >
@@ -79,7 +87,7 @@
   delay: 1
   loop: "{{ pkg_list }}"
 
-- name: hold packages
+- name: 'hold packages'
   dpkg_selections:
     name: "{{ item.name }}"
     selection: hold

@@ -1,5 +1,3 @@
 ---
 
 pkg_list: []
-
-pkg_Debian_apt_allow_downgrades: False

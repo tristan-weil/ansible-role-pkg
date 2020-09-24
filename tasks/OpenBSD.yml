@@ -4,9 +4,9 @@
 # - check locks
 # - add retries
 
-- name: install/remove packages
+- name: 'pkg_add'
   openbsd_pkg:
     name: "{{ item.name | default(item) }}"
     state: "{{ item.state | default('present') }}"
-    purge: True
+    clean: True
   loop: "{{ pkg_list }}"

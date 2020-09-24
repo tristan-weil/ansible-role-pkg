@@ -1,0 +1,30 @@
+---
+
+driver:
+  name: 'vagrant'
+  provider:
+    name: 'virtualbox'
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+  flake8 .
+
+platforms:
+  - name: 'OpenBSD'
+    box: 'generic/openbsd6'
+    boot_timeout: 600
+
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      stdout_callback: 'yaml'
+      bin_ansible_callbacks: True
+  options:
+    D: True
+  log: True
+
+verifier:
+  name: 'ansible'

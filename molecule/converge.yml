@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  name: 'Converge'
+  become: True
+
+  tasks:
+    - import_role:
+        name: 'ansible-role-pkg'
+      vars:
+        pkg_list:
+          - lynx
+          - alpine
