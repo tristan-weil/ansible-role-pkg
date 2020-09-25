@@ -10,7 +10,7 @@ lint: |
   flake8 .
 
 platforms:
-  - name: 'target'
+  - name: 'target-debian-${MOLECULE_INSTANCE_NAME_SUFFIX:-1}'
     image: '${MOLECULE_LINUX_DISTRIBUTION:-geerlingguy/docker-debian10-ansible:latest}'
     command: ''
     volumes:
