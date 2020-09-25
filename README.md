@@ -69,3 +69,15 @@ Optional variables:
 ## Todo
 
 On OpenBSD, add a check on the lock and some retries.
+
+## Dependencies
+
+None.
+
+## Supported platforms
+
+See [meta/main.yml](https://github.com/tristan-weil/ansible-role-pkg/blob/master/meta/main.yml)
+
+## License
+
+See [LICENSE.md](https://github.com/tristan-weil/ansible-role-pkg/blob/master/LICENSE.md)
