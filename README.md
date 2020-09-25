@@ -4,6 +4,8 @@ An Ansible Role that installs a list of packages.
 
 **NOTE**: packages already installed won't be upgraded if the version is not provided.
 
+[![Actions Status](https://github.com/tristan-weil/ansible-role-pkg/workflows/molecule/badge.svg?branch=master)](https://github.com/tristan-weil/ansible-role-pkg/actions)
+
 ## Role Variables
 
 Available variables are listed below, (see also `defaults/main.yml`).
