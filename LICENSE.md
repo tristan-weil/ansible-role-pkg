@@ -1,7 +1,7 @@
 License
 =======
 
-ansible-role-pkg is free software under OpenBSD's ISC-style license.
+ansible-role-pkg is free software under ISC-style license.
 
 > Copyright (c) 2018-2020 Tristan Weil <titou@lab.t18s.fr>
 > 
