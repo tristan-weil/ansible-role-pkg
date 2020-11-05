@@ -80,4 +80,4 @@ See [meta/main.yml](https://github.com/tristan-weil/ansible-role-pkg/blob/master
 
 ## License
 
-See [LICENSE.md](https://github.com/tristan-weil/ansible-role-pkg/blob/master/LICENSE.md)
+See [LICENSE.md](LICENSE.md)
